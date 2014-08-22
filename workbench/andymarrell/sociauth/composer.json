@@ -1,0 +1,26 @@
+{
+    "name": "andymarrell/sociauth",
+    "description": "",
+    "authors": [
+        {
+            "name": "Andy Marrel",
+            "email": "andymarrel.dev@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "4.2.*",
+        "google/apiclient": "1.0.*@beta",
+        "facebook/php-sdk-v4" : "4.0.*"
+    },
+    "autoload": {
+        "classmap": [
+            "src/migrations",
+            "src/Andymarrell/Sociauth/Providers/Exceptions.php"
+        ],
+        "psr-0": {
+            "Andymarrell\\Sociauth\\": "src/"
+        }
+    },
+    "minimum-stability": "stable"
+}

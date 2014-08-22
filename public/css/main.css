@@ -1,0 +1,93 @@
+* {
+    border-radius: 0 !important;
+}
+
+.navbar {
+    border: 0;
+    border-bottom: 2px solid #3071a9;
+}
+
+.navbar-default .navbar-brand {
+    background-color: #3071a9;
+    color: #fff;
+}
+
+.navbar-default:hover .navbar-brand:hover {
+    background-color: #3071a9;
+    color: #fff;
+}
+
+.badge {
+    border-radius: 4px !important;
+}
+
+.small-heading {
+    text-transform: uppercase;
+    font-size: small;
+    color: #aeaeae;
+    font-weight: bold;
+    padding:0 0 15px 15px;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+a.follow:hover, a.share:hover {
+    transition: all 0.2s ease;
+}
+
+a.follow {
+    padding: 5px;
+    border: 1px solid mediumseagreen;
+    color: mediumseagreen;
+}
+
+a.share {
+    padding: 5px;
+    border: 1px solid #aeaeae;
+    color: #aeaeae;
+}
+
+a.follow:hover {
+    text-decoration: none;
+    -moz-box-shadow: 2px 2px 0px mediumseagreen;
+    -webkit-box-shadow: 2px 2px 0px mediumseagreen;
+    box-shadow: 2px 2px 0px mediumseagreen;
+}
+
+a.share:hover {
+    text-decoration: none;
+    -moz-box-shadow: 2px 2px 0px #aeaeae;
+    -webkit-box-shadow: 2px 2px 0px #aeaeae;
+    box-shadow: 2px 2px 0px #aeaeae;
+}
+
+.achievements-panel {
+    background-color: #FFF8DC;
+
+}
+
+.achievements-panel > .panel-body > i {
+    color: #333;
+}
+
+.achievements-panel > .panel-body > a {
+    color: #333;
+}
+
+.number-of-answers {
+    padding: 2px 5px;
+    font-weight: bold;
+}
+
+.tags {
+    margin-bottom: 20px;
+}
+
+.tags > span {
+    padding: 2px;
+    background-color: #eeeeee;
+    margin:0 4px 0 0;
+    font-size: small;
+}
