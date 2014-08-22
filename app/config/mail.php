@@ -54,7 +54,7 @@ return array(
 	|
 	*/
 
-	'from' => array('address' => 'info@qdump.ru', 'name' => 'Qdump Assistant'),
+	'from' => array('address' => 'support@qdump.ru', 'name' => 'Служба поддержки Qdump.ru'),
 
 	/*
 	|--------------------------------------------------------------------------

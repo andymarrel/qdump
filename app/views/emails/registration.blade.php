@@ -2,11 +2,16 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Complete registration on Qdump.ru</title>
+        <title>Завершение регистрации в сервисе Qdump.ru</title>
     </head>
     <body>
-        <p>Dear Customer!</p>
-        <p>Please complete your registration by clicking on the link below:</p>
-        <p><a href="http://qdump.ru/activate/{{ $id }}/{{ $code }}" target="_blank">Complete registration!</a></p>
+        <p>Доброго времени суток!</p>
+        <br>
+        <p>Благодарим Вас за то, что решили попробовать наш сервис.</p>
+        <p>Чтобы завершить регистрацию и авторизоваться в системе кудамп, вам необходимо пройти по следующей ссылке: <strong><a href="http://qdump.ru/activate/{{ $id }}/{{ $code }}" target="_blank">http://qdump.ru/activate/{{ $id }}/{{ $code }}</a></strong>.</p>
+        <br>
+        <p>С уважением,<br>
+        Служба поддержки Qdump.</p><br>
+        <p>П.С. Данное письмо было сгенерировано автоматически и не требует обратного ответа.</p>
     </body>
 </html>

@@ -75,7 +75,7 @@ class AuthController extends BaseController {
                      */
                     Mail::send('emails.registration', ['id' => $user->id, 'code' => $activationCode], function($message) use ($user){
                         $message->to($user->email)
-                            ->subject('Complete Qdump registration');
+                            ->subject('Завершение регистрации в сервисе Qdump');
                     });
                 } catch (Cartalyst\Sentry\Users\LoginRequiredException $e) {
                     $errors['email'] = 'Неверный адрес электронной почты';
@@ -218,6 +218,18 @@ class AuthController extends BaseController {
                         return $this->redirectWithNotification('Аккаунт успешно привязан!', '', '/settings/accounts');
                     }
 
+                    $socialLink = SocialLink::findByProviderAndSocialId($provider, $uid);
+
+                    // If social accound is linked to qdump account,
+                    // authorizing qdump account
+                    if ($socialLink !== null) {
+                        // Authorized linked account
+                        Sentry::login(Sentry::findUserById($socialLink->user_id));
+
+                        // Redirecting with success
+                        return $this->redirectWithNotification('Вы успешно вошли в систему!');
+                    }
+
                     $user = User::whereRaw('social_provider = ? AND social_uid = ?', [
                         $provider,
                         $uid
@@ -225,9 +237,7 @@ class AuthController extends BaseController {
 
                     /**
                      * If we already have this registered user with data from social network,
-                     * than checking following conditions and updating email:
-                     *  If this account linked, authorizing linked account
-                     *  If not linked, authorizing this account
+                     * than logging in as social account and updating email:
                      *
                      * If not, creating new user and logging in
                      */
@@ -238,16 +248,10 @@ class AuthController extends BaseController {
                             $user->save();
                         }
 
-                        $link = SocialLink::findByProviderAndSocialId($provider, $uid);
+                        // Logging in
+                        Sentry::login(Sentry::findUserById($user->id));
 
-                        if ($link !== null) {
-                            // Authorized linked account
-                            Sentry::login(Sentry::findUserById($link->user_id));
-                        } else {
-                            // Authorized social account
-                            Sentry::login(Sentry::findUserById($user->id));
-                        }
-
+                        // Redirecting with success
                         return $this->redirectWithNotification('Вы успешно вошли в систему!');
                     } else {
                         $user = User::where('email', '=', $email)->first();
@@ -271,7 +275,7 @@ class AuthController extends BaseController {
                             // Logging him in
                             Sentry::login($user);
 
-                            // Redirecting to main page
+                            // Redirecting with success
                             return $this->redirectWithNotification('Вы успешно вошли в систему!');
                         }
                     }
