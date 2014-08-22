@@ -2,12 +2,6 @@
 
 class SettingsController extends BaseController {
     public function indexAction(){
-        if (!Sentry::check()){
-            return Redirect::to('/')->with('notification', [
-                'type' => 'error',
-                'message' => 'Необходимо войти в систему'
-            ]);
-        }
         return View::make('settings/settings');
     }
 
@@ -16,10 +10,6 @@ class SettingsController extends BaseController {
     }
 
     public function unlinkAction($provider) {
-        if (!Sentry::check()){
-            return $this->redirectToMainWithNeedAuthorizationMessage();
-        }
-
         $providers = Sociauth::getActiveProviders();
 
         if (array_key_exists($provider, $providers)){

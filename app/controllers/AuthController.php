@@ -2,13 +2,6 @@
 
 class AuthController extends BaseController {
     public function indexAction(){
-        if (Sentry::check()){
-            return Redirect::to('/')->with('notification', [
-                'type' => 'error',
-                'message' => 'Вы уже в системе'
-            ]);
-        }
-
         return View::make('auth.auth');
     }
 
@@ -26,7 +19,6 @@ class AuthController extends BaseController {
     public function postRegisterAction(){
         $result = false;
         $errors = [];
-        $userData = [];
 
         // Handling registration request
         if (Input::has('sent')) {
@@ -78,6 +70,9 @@ class AuthController extends BaseController {
 
                     $activationCode = $user->getActivationCode();
 
+                    /**
+                     * @todo Create new template for email
+                     */
                     Mail::send('emails.registration', ['id' => $user->id, 'code' => $activationCode], function($message) use ($user){
                         $message->to($user->email)
                             ->subject('Complete Qdump registration');
@@ -108,7 +103,7 @@ class AuthController extends BaseController {
         $result = false;
         $errors = [];
 
-        if (Input::has('sent') && !Sentry::check()) {
+        if (Input::has('sent')) {
             $rules = [
                 'email' => 'required|email',
                 'password' => 'required|min:6',
@@ -288,19 +283,11 @@ class AuthController extends BaseController {
     }
 
     public function logoutAction(){
-        // If user is logged in, then logging him out
-        if (Sentry::check()){
-            Sentry::logout();
-            return Redirect::to('/')->with('notification', [
-                'type' => '',
-                'message' => 'Вы успешно вышли из системы!'
-            ]);
-        }
+        Sentry::logout();
 
-        // If not - showing him 404 not found page
         return Redirect::to('/')->with('notification', [
-            'type' => 'error',
-            'message' => 'Необходимо войти в систему'
+            'type' => '',
+            'message' => 'Вы успешно вышли из системы!'
         ]);
     }
 

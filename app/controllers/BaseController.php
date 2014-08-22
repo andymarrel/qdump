@@ -12,16 +12,4 @@ class BaseController extends Controller {
             'message' => $notificationMessage
         ]);
     }
-
-    /**
-     * If user is not authorized, than redirecting to main with message
-     *
-     * @return mixed
-     */
-    protected function redirectToMainWithNeedAuthorizationMessage(){
-        return Redirect::to('/')->with('notification', [
-            'type' => 'error',
-            'message' => 'Необходимо войти в систему'
-        ]);
-    }
 }
