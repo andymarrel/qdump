@@ -6,13 +6,6 @@ class AuthController extends BaseController {
     }
 
     public function registerAction(){
-        if (Sentry::check()){
-            return Redirect::to('/')->with('notification', [
-                'type' => 'error',
-                'message' => 'Вы уже в системе'
-            ]);
-        }
-
         return View::make('auth.register');
     }
 
@@ -289,14 +282,11 @@ class AuthController extends BaseController {
     public function logoutAction(){
         Sentry::logout();
 
-        return Redirect::to('/')->with('notification', [
-            'type' => '',
-            'message' => 'Вы успешно вышли из системы!'
-        ]);
+        return $this->redirectWithNotification('Вы успешно вышли из системы!');
     }
 
     public function passwordRecoveryAction() {
-
+        return View::make('auth.recovery');
     }
 
     public function activateAction($userId, $code) {
@@ -305,27 +295,14 @@ class AuthController extends BaseController {
 
             if ($user->attemptActivation($code)){
                 Sentry::login($user);
-
-                return Redirect::to('/')->with('notification', [
-                    'message' => 'Активация прошла успешно!',
-                    'type' => ''
-                ]);
+                return $this->redirectWithNotification('Активация прошла успешно!');
             } else {
-                return Redirect::to('/')->with('notification', [
-                    'message' => 'Активация не удалась',
-                    'type' => 'error'
-                ]);
+                return $this->redirectWithNotification('Активация не удалась', 'error');
             }
         } catch (Cartalyst\Sentry\Users\UserNotFoundException $e) {
-            return Redirect::to('/')->with('notification', [
-                'message' => 'Пользователь не найден',
-                'type' => 'error'
-            ]);
+            return $this->redirectWithNotification('Пользователь не найден', 'error');
         } catch (Cartalyst\Sentry\Users\UserAlreadyActivatedException $e) {
-            return Redirect::to('/')->with('notification', [
-                'message' => 'Пользователь уже активирован',
-                'type' => 'error'
-            ]);
+            return $this->redirectWithNotification('Пользователь уже активирован', 'error');
         }
     }
 

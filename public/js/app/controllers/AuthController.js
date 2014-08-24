@@ -134,4 +134,9 @@ qdump.controller('AuthController', function($scope){
             });
         }
     };
+    $scope.recovery = {
+        sendToken: function(data){
+            console.log(data);
+        }
+    };
 });
