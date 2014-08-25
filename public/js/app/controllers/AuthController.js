@@ -1,4 +1,10 @@
 qdump.controller('AuthController', function($scope){
+    $scope.global = {
+        validateEmail: function(email) {
+            var emailRegExp = new RegExp("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
+            return (email.match(emailRegExp) == null) ? false : true;
+        }
+    };
     $scope.registration = {
         register: function(event, data){
             $.ajax('/register', {
@@ -135,8 +141,58 @@ qdump.controller('AuthController', function($scope){
         }
     };
     $scope.recovery = {
-        sendToken: function(data){
-            console.log(data);
+        sendToken: function(event, data){
+            event.preventDefault();
+            $scope.recovery.removeErrors();
+            $scope.auth.refreshCaptcha();
+
+            var emailElem = $("#email"),
+                captchaElem = $("#captcha"),
+                token = $('[name="_token"]').val(),
+                errors = false;
+
+            if (!$scope.global.validateEmail(data.email)) {
+                $scope.registration.addError(emailElem, 'Неверный адрес электронной почты');
+                errors = true;
+            }
+
+            if (data.captcha == '') {
+                $scope.registration.addError(captchaElem, 'Это поле необходимо заполнить');
+                errors = true;
+            }
+
+            if (!errors) {
+                $.ajax('/recovery/post', {
+                    type: 'post',
+                    dataType: 'json',
+                    data: {
+                        email: data.email,
+                        captcha: data.captcha
+                    },
+                    beforeSend: function(request) {
+                        return request.setRequestHeader('X-CSRF-Token', token);
+                    },
+                    success: function (response) {
+                        if (response.result === false) {
+                            var errors = response.errors;
+
+                            if (errors.hasOwnProperty('email')) {
+                                $scope.registration.addError(emailElem, errors.email);
+                            }
+
+                            if (errors.hasOwnProperty('captcha')) {
+                                $scope.registration.addError(captchaElem, errors.captcha);
+                            }
+                        } else {
+
+                        }
+                    }
+                });
+            }
+        },
+        removeErrors: function(){
+            $("#email, #captcha").parent().removeClass('has-error has-feedback');
+            $("span.form-control-feedback").remove();
         }
     };
 });

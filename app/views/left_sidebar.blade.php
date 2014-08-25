@@ -6,6 +6,7 @@
             <a href="#" class="list-group-item">Уведомления</a>
             <a href="#" class="list-group-item">Подписчики</a>
         @else
+            <a href="/auth" class="list-group-item">Войти</a>
             <a href="/register" class="list-group-item">Зарегистрироваться</a>
         @endif
     </div>

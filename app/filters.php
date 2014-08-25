@@ -77,11 +77,18 @@ Route::filter('guest', function()
 
 Route::filter('csrf', function()
 {
-	if (Session::token() != Input::get('_token'))
+    $token = Request::ajax() ? Request::header('x-csrf-token') : Input::get('_token');
+
+	if (Session::token() != $token)
 	{
-		throw new Illuminate\Session\TokenMismatchException;
+		//throw new Illuminate\Session\TokenMismatchException;
+        return Redirect::to('/')->with('notification', [
+            'type' => 'error',
+            'message' => 'Ошибка безопасности: неверный код безопасности'
+        ]);
 	}
 });
+
 
 App::missing(function($exception)
 {

@@ -289,6 +289,78 @@ class AuthController extends BaseController {
         return View::make('auth.recovery');
     }
 
+    public function postRecoveryAction() {
+        $result = false;
+        $email = Input::get('email');
+        $errors = [];
+
+        $messages = [
+            'email.required' => 'Это поле необходимо заполнить',
+            'email.email' => 'Неверный адрес электронной почты',
+            'captcha.required' => 'Это поле необходимо заполнить',
+            'captcha.captcha' => 'Картинка введена неверно'
+        ];
+
+        $rules = [
+            'email' => 'required|email',
+            'captcha' => 'required|captcha'
+        ];
+
+        $validator = Validator::make(Input::all(), $rules, $messages);
+
+        if ($validator->fails()){
+            $errorMessages = $validator->messages();
+            if ($errorMessages->has('email')){
+                $errors['email'] = $errorMessages->first('email');
+            }
+            if ($errorMessages->has('captcha')) {
+                $errors['captcha'] = $errorMessages->first('captcha');
+            }
+        } else {
+            try {
+                $user = Sentry::findUserByLogin($email);
+                $resetCode = $user->getResetPasswordCode();
+
+                Mail::send('emails.recovery_step_1', ['code' => $resetCode, 'userId' => $user->id], function($message) use ($user) {
+                    $message->to($user->email)
+                        ->subject('Восстановление пароля в сервисе Qdump.ru');
+                });
+            } catch (Cartalyst\Sentry\Users\UserNotFoundException $e) {
+                $errors['email'] = 'Пользователь не найден';
+            }
+        }
+
+        if (empty($errors)){
+            $result = true;
+        }
+
+        return Response::json([
+            'result' => $result,
+            'errors' => $errors
+        ]);
+    }
+
+    public function postRecoveryResetAction($userId, $code) {
+        try {
+            // Find the user using the user id
+            $user = Sentry::findUserById($userId);
+
+            // Check if the reset password code is valid
+            if ($user->checkResetPasswordCode($code)) {
+                // Attempt to reset the user password
+                if ($user->attemptResetPassword($code, 'andrew1')) {
+                    return $this->redirectWithNotification('Пароль успешно изменён!');
+                } else {
+                    return $this->redirectWithNotification('Не удалось изменить пароль', 'error');
+                }
+            } else {
+                // The provided password reset code is Invalid
+            }
+        } catch (Cartalyst\Sentry\Users\UserNotFoundException $e) {
+            echo 'User was not found.';
+        }
+    }
+
     public function activateAction($userId, $code) {
         try {
             $user = Sentry::findUserById((int)$userId);
