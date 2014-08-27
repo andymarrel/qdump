@@ -348,17 +348,31 @@ class AuthController extends BaseController {
             // Check if the reset password code is valid
             if ($user->checkResetPasswordCode($code)) {
                 // Attempt to reset the user password
-                if ($user->attemptResetPassword($code, 'andrew1')) {
-                    return $this->redirectWithNotification('Пароль успешно изменён!');
+                $randomPassword = $this->generateRandomString();
+                if ($user->attemptResetPassword($code, $randomPassword)) {
+                    Mail::send('emails.recovery_step_2', ['password' => $randomPassword], function($message) use ($user) {
+                        $message->to($user->email)
+                            ->subject('Восстановление пароля в сервисе Qdump.ru');
+                    });
+                    return $this->redirectWithNotification('Новый пароль отправлен на ваш электронный адрес', '', '/auth');
                 } else {
                     return $this->redirectWithNotification('Не удалось изменить пароль', 'error');
                 }
             } else {
-                // The provided password reset code is Invalid
+                return $this->redirectWithNotification('Не удалось изменить пароль', 'error');
             }
         } catch (Cartalyst\Sentry\Users\UserNotFoundException $e) {
             echo 'User was not found.';
         }
+    }
+
+    protected function generateRandomString($length = 10) {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $randomString = '';
+        for ($i = 0; $i < $length; $i++) {
+            $randomString .= $characters[rand(0, strlen($characters) - 1)];
+        }
+        return $randomString;
     }
 
     public function activateAction($userId, $code) {
