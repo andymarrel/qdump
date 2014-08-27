@@ -3,6 +3,11 @@ qdump.controller('AuthController', function($scope){
         validateEmail: function(email) {
             var emailRegExp = new RegExp("[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?");
             return (email.match(emailRegExp) == null) ? false : true;
+        },
+        addSuccessMessage: function(elem, message) {
+            $('<div class="alert alert-success" style="display: none;">'+message+'</div>')
+                .appendTo(elem)
+                .slideDown('slow');
         }
     };
     $scope.registration = {
@@ -17,20 +22,19 @@ qdump.controller('AuthController', function($scope){
                     captcha: data.captcha,
                     sent: true
                 },
+                beforeSend: function(){
+                    qdump.global.addButtonLoadingState($("#send-registration-btn"));
+                },
+                complete: function(){
+                    qdump.global.removeButtonLoadingState($("#send-registration-btn"), 'Зарегистрироваться');
+                },
                 success: function(response){
                     $scope.registration.removeSuccessAlert();
                     $scope.registration.removeErrors();
                     $scope.auth.refreshCaptcha();
                     if (response.result === true) {
                         $scope.registration.emptyForm();
-
-                        $('<div class="alert alert-success" style="display: none;"><strong>Регистрация прошла успешно!</strong> Чтобы завершить регистрацию, пройдите по ссылке, которую мы отправили на указанный вами электронный адрес.</div>')
-                            .appendTo($("#registartion-status"))
-                            .slideDown('slow');
-
-                        setTimeout(function(){
-                            $scope.registration.removeSuccessAlert();
-                        }, 5000);
+                        $scope.global.addSuccessMessage($("#registartion-status"), '<strong>Регистрация прошла успешно!</strong> Чтобы завершить регистрацию, пройдите по ссылке, которую мы отправили на указанный вами электронный адрес.');
                     } else {
                         var errors = response.errors,
                             emailElem = $("#email"),
@@ -170,9 +174,16 @@ qdump.controller('AuthController', function($scope){
                         captcha: data.captcha
                     },
                     beforeSend: function(request) {
+                        qdump.global.addButtonLoadingState($("#send-recovery-btn"));
                         return request.setRequestHeader('X-CSRF-Token', token);
                     },
+                    complete: function() {
+                        qdump.global.removeButtonLoadingState($("#send-recovery-btn"), 'Продолжить');
+                    },
                     success: function (response) {
+                        $scope.recovery.removeSuccessMessage();
+                        $scope.auth.refreshCaptcha();
+
                         if (response.result === false) {
                             var errors = response.errors;
 
@@ -184,11 +195,19 @@ qdump.controller('AuthController', function($scope){
                                 $scope.registration.addError(captchaElem, errors.captcha);
                             }
                         } else {
+                            $scope.recovery.emptyForm();
 
+                            $scope.global.addSuccessMessage($("#recovery-status"), '<strong>Восстановление пароля прошло успешно!</strong> Письмо с дальнейшими инструкциями отправлено на указанный электронный адрес.');
                         }
                     }
                 });
             }
+        },
+        emptyForm: function(){
+            $("#email, #captcha").val('');
+        },
+        removeSuccessMessage: function(){
+            $("#recovery-status").html('');
         },
         removeErrors: function(){
             $("#email, #captcha").parent().removeClass('has-error has-feedback');

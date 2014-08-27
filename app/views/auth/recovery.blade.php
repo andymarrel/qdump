@@ -9,6 +9,7 @@
 @section('body')
     <div class="col-lg-10 col-lg-offset-1">
         <form>
+            <div id="recovery-status"></div>
             {{ Form::token() }}
             <div class="form-group">
                 <label for="email" class="control-label">Э-почта</label>
@@ -17,12 +18,12 @@
             </div>
             <div class="form-group">
                 <label for="captcha" class="control-label">Код безопасности</label>
-                <input ng-init="form.captcha=''" ng-model="form.captcha" type="text" class="form-control" id="captcha" name="captcha" placeholder="Введите код безопасности">
+                <input ng-init="form.captcha=''" ng-model="form.captcha" type="text" class="form-control" id="captcha" name="captcha" autocomplete="off" placeholder="Введите код безопасности">
                 <i style="display: block"><small style="color: #aeaeae">Нажмите на картинку, чтобы обновить код безопасности</small></i>
                 <div style="margin: 10px 0;"><span id="captcha-container" style="cursor: pointer" ng-click="auth.refreshCaptcha()">{{ HTML::image(Captcha::img(), 'Captcha') }}</span></div>
             </div>
             <div class="form-group">
-                <button ng-click="recovery.sendToken($event, form)" class="btn btn-default">Продолжить</button>
+                <button id="send-recovery-btn" ng-click="recovery.sendToken($event, form)" class="btn btn-default">Продолжить</button>
             </div>
         </form>
     </div>

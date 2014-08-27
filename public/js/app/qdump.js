@@ -17,5 +17,12 @@ qdump.global = {
             type: type,
             delay: 5000
         });
+    },
+    addButtonLoadingState: function(elem) {
+        elem.html('<img src="/img/ajax-loader.gif" alt="Загрузка">');
+    },
+    removeButtonLoadingState: function(elem, buttonText) {
+        elem.html('');
+        elem.text(buttonText);
     }
 };
