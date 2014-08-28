@@ -8,6 +8,22 @@ qdump.controller('AuthController', function($scope){
             $('<div class="alert alert-success" style="display: none;">'+message+'</div>')
                 .appendTo(elem)
                 .slideDown('slow');
+        },
+        addError: function(element, message){
+            element.parent().addClass('has-error has-feedback');
+            $('<span class="glyphicon glyphicon-remove form-control-feedback" rel="tooltip" data-toggle="tooltip" data-placement="right" data-title="'+message+'"></span>').insertAfter(element);
+        },
+        refreshCaptcha: function(){
+            $.ajax('/captcha/refresh', {
+                type: 'get',
+                dataType: 'text',
+                success: function(response){
+                    $("#captcha-container").html('<img src="'+response+'" alt="Captcha">');
+                },
+                error: function(xhr, status, error){
+                    console.log(error);
+                }
+            });
         }
     };
     $scope.registration = {
@@ -31,7 +47,8 @@ qdump.controller('AuthController', function($scope){
                 success: function(response){
                     $scope.registration.removeSuccessAlert();
                     $scope.registration.removeErrors();
-                    $scope.auth.refreshCaptcha();
+                    $scope.global.refreshCaptcha();
+
                     if (response.result === true) {
                         $scope.registration.emptyForm();
                         $scope.global.addSuccessMessage($("#registartion-status"), '<strong>Регистрация прошла успешно!</strong> Чтобы завершить регистрацию, пройдите по ссылке, которую мы отправили на указанный вами электронный адрес.');
@@ -43,30 +60,23 @@ qdump.controller('AuthController', function($scope){
                             captchaElem = $("#captcha");
 
                         if (errors.hasOwnProperty('email')) {
-                            $scope.registration.addError(emailElem, errors.email);
+                            $scope.global.addError(emailElem, errors.email);
                         }
 
                         if (errors.hasOwnProperty('password')) {
-                            $scope.registration.addError(passElem, errors.password);
+                            $scope.global.addError(passElem, errors.password);
                         }
 
                         if (errors.hasOwnProperty('password_again')) {
-                            $scope.registration.addError(passAgainElem, errors.password_again);
+                            $scope.global.addError(passAgainElem, errors.password_again);
                         }
 
                         if (errors.hasOwnProperty('captcha')) {
-                            $scope.registration.addError(captchaElem, errors.captcha);
+                            $scope.global.addError(captchaElem, errors.captcha);
                         }
                     }
                 }
             });
-        },
-        addError: function(element, message){
-            element.parent().addClass('has-error has-feedback');
-            $('<span class="glyphicon glyphicon-remove form-control-feedback" rel="tooltip" data-toggle="tooltip" data-placement="right" data-title="'+message+'"></span>').insertAfter(element);
-        },
-        addCaptchaError: function(element, message) {
-            element.parent().addClass('has-error has-feedback');
         },
         removeErrors: function(){
             $("#email, #password, #password-again, #captcha").parent().removeClass('has-error has-feedback');
@@ -82,7 +92,7 @@ qdump.controller('AuthController', function($scope){
     $scope.auth = {
         authenticate: function(event, data){
             event.preventDefault();
-            $scope.auth.refreshCaptcha();
+            $scope.global.refreshCaptcha();
             $scope.auth.removeErrors();
             
             $.ajax('/login', {
@@ -112,13 +122,13 @@ qdump.controller('AuthController', function($scope){
                             captchaElem = $("#captcha");
 
                         if (response.errors.hasOwnProperty('email')){
-                            $scope.registration.addError(emailElem, response.errors.email);
+                            $scope.global.addError(emailElem, response.errors.email);
                         }
                         if (response.errors.hasOwnProperty('password')){
-                            $scope.registration.addError(passElem, response.errors.password)
+                            $scope.global.addError(passElem, response.errors.password)
                         }
                         if (response.errors.hasOwnProperty('captcha')){
-                            $scope.registration.addError(captchaElem, response.errors.captcha)
+                            $scope.global.addError(captchaElem, response.errors.captcha)
                         }
                     }
                 }
@@ -130,25 +140,13 @@ qdump.controller('AuthController', function($scope){
         removeErrors: function(){
             $("#email, #password, #captcha").parent().removeClass('has-error has-feedback');
             $("span.form-control-feedback").remove();
-        },
-        refreshCaptcha: function(){
-            $.ajax('/captcha/refresh', {
-                type: 'get',
-                dataType: 'text',
-                success: function(response){
-                    $("#captcha-container").html('<img src="'+response+'" alt="Captcha">');
-                },
-                error: function(xhr, status, error){
-                    console.log(error);
-                }
-            });
         }
     };
     $scope.recovery = {
         sendToken: function(event, data){
             event.preventDefault();
             $scope.recovery.removeErrors();
-            $scope.auth.refreshCaptcha();
+            $scope.global.refreshCaptcha();
 
             var emailElem = $("#email"),
                 captchaElem = $("#captcha"),
@@ -156,12 +154,12 @@ qdump.controller('AuthController', function($scope){
                 errors = false;
 
             if (!$scope.global.validateEmail(data.email)) {
-                $scope.registration.addError(emailElem, 'Неверный адрес электронной почты');
+                $scope.global.addError(emailElem, 'Неверный адрес электронной почты');
                 errors = true;
             }
 
             if (data.captcha == '') {
-                $scope.registration.addError(captchaElem, 'Это поле необходимо заполнить');
+                $scope.global.addError(captchaElem, 'Это поле необходимо заполнить');
                 errors = true;
             }
 
@@ -182,17 +180,16 @@ qdump.controller('AuthController', function($scope){
                     },
                     success: function (response) {
                         $scope.recovery.removeSuccessMessage();
-                        $scope.auth.refreshCaptcha();
 
                         if (response.result === false) {
                             var errors = response.errors;
 
                             if (errors.hasOwnProperty('email')) {
-                                $scope.registration.addError(emailElem, errors.email);
+                                $scope.global.addError(emailElem, errors.email);
                             }
 
                             if (errors.hasOwnProperty('captcha')) {
-                                $scope.registration.addError(captchaElem, errors.captcha);
+                                $scope.global.addError(captchaElem, errors.captcha);
                             }
                         } else {
                             $scope.recovery.emptyForm();
