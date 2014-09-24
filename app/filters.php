@@ -82,10 +82,19 @@ Route::filter('csrf', function()
 	if (Session::token() != $token)
 	{
 		//throw new Illuminate\Session\TokenMismatchException;
-        return Redirect::to('/')->with('notification', [
-            'type' => 'error',
-            'message' => 'Ошибка безопасности: неверный код безопасности'
-        ]);
+        if (Request::ajax()){
+            return Response::json([
+                'result' => false,
+                'errors' => [
+                    'csrf' => 'Ошибка безопасности: неверный код безопасности'
+                ]
+            ]);
+        } else {
+            return Redirect::to('/')->with('notification', [
+                'type' => 'error',
+                'message' => 'Ошибка безопасности: неверный код безопасности'
+            ]);
+        }
 	}
 });
 

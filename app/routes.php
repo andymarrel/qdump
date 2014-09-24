@@ -32,3 +32,4 @@ Route::get('/activate/{userId}/{code}', 'AuthController@activateAction');
 Route::get('/settings', ['before' => 'auth', 'uses' => 'SettingsController@indexAction']);
 Route::get('/settings/accounts', ['before' => 'auth', 'uses' => 'SettingsController@accountsAction']);
 Route::get('/settings/unlink/{provider}', ['before' => 'auth', 'uses' => 'SettingsController@unlinkAction']);
+Route::post('/settings/change/info', ['before' => 'csrf|auth', 'uses' => 'SettingsController@postChangeUserInfoAction']);

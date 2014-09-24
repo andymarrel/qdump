@@ -21,7 +21,7 @@
                                        <label for="captcha" class="control-label">Код безопасности</label>
                                        <input ng-init="form.captcha=undefined"  ng-model="form.captcha" autocomplete="off" type="text" class="form-control" id="captcha" name="captcha" placeholder="Введите код безопасности">
                                        <i style="display: block"><small style="color: #aeaeae">Нажмите на картинку, чтобы обновить код безопасности</small></i>
-                                       <div style="margin: 10px 0;"><span id="captcha-container" style="cursor: pointer" ng-click="auth.refreshCaptcha()">{{ HTML::image(Captcha::img(), 'Captcha') }}</span></div>
+                                       <div style="margin: 10px 0;"><span id="captcha-container" style="cursor: pointer" ng-click="global.refreshCaptcha()">{{ HTML::image(Captcha::img(), 'Captcha') }}</span></div>
                                   </div>
                                   <div class="form-group">
                                         <div class="checkbox">

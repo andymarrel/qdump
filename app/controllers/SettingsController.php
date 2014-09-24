@@ -1,6 +1,12 @@
 <?php
 
 class SettingsController extends BaseController {
+    public function postChangeUserInfoAction(){
+        return Response::json([
+            'result' => true
+        ]);
+    }
+
     public function indexAction(){
         return View::make('settings/settings');
     }
